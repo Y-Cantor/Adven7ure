@@ -15,6 +15,7 @@ const store = createStore({
     name: defaultName,
     systemMessage: {},
     messages: [],
+    isLoading: false,
   },
   mutations: {
     addMessages(state, messages) {
@@ -22,6 +23,9 @@ const store = createStore({
     },
     setSystemMessage(state, systemMessage) {
       state.systemMessage = systemMessage;
+    },
+    setIsLoading(state, isLoading) {
+      state.isLoading = isLoading;
     },
   },
   actions: {
@@ -32,12 +36,14 @@ const store = createStore({
         state.name
       );
       commit("setSystemMessage", systemMessage);
+      commit("setIsLoading", true);
       createChatCompletion([state.systemMessage])
         .then((res) => {
           console.log(res.choices[0].message.content);
           commit("addMessages", [
             { role: "assistant", content: res.choices[0].message.content },
           ]);
+          commit("setIsLoading", false);
         })
         .catch((err) => {
           console.log("Error:", err);
@@ -47,12 +53,14 @@ const store = createStore({
       console.log(userInput);
       const userMessage = { role: "user", content: userInput };
       commit("addMessages", [userMessage]);
+      commit("setIsLoading", true);
       createChatCompletion([state.systemMessage, ...state.messages])
         .then((res) => {
           console.log(res.choices[0].message.content);
           commit("addMessages", [
             { role: "assistant", content: res.choices[0].message.content },
           ]);
+          commit("setIsLoading", false);
         })
         .catch((err) => {
           console.log("Error:", err);
@@ -61,6 +69,7 @@ const store = createStore({
   },
   getters: {
     getMessages: (state) => state.messages,
+    isLoading: (state) => state.isLoading,
   },
 });
 

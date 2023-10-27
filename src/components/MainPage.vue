@@ -1,15 +1,14 @@
 <template>
+  <div class="page-header">
+    <h2>Create Your Own Adven7ure</h2>
+  </div>
   <div class="container">
-    <div class="header-container">
-      <!-- replace with components -->
-      <div v-if="messages.length" class="update-adventure">
-        <h3>Update Your Adven7ure</h3>
-        <button @click="update" class="start-button">UPDATE</button>
-      </div>
-      <div v-else class="start-adventure">
-        <h2>Create Your Own Adven7ure</h2>
-        <button @click="start" class="start-button">START</button>
-      </div>
+    <div class="settings-container">
+      <AdventureSettings
+        :variant="messages.length"
+        @start="start"
+        @update="update"
+      />
     </div>
     <div v-if="messages.length" class="messages-container">
       <MessageBox
@@ -19,6 +18,7 @@
       >
       </MessageBox>
     </div>
+    <div v-if="isLoading" class="loader">Loading...</div>
     <div class="input-container">
       <h3>What Do You Do?</h3>
       <InputWithButton
@@ -34,7 +34,8 @@
 <script>
   import { ref } from "vue";
   import InputWithButton from "./InputWithButton.vue";
-  import MessageBox from "./MessageBox.vue"; // Import the Message component
+  import MessageBox from "./MessageBox.vue";
+  import AdventureSettings from "./AdventureSettings.vue";
 
   import { useStore } from "vuex";
   import { computed } from "vue";
@@ -43,11 +44,13 @@
     components: {
       InputWithButton,
       MessageBox,
+      AdventureSettings,
     },
     setup() {
       const inputValue = ref("");
       const store = useStore();
       const messages = computed(() => store.getters.getMessages);
+      const isLoading = computed(() => store.getters.isLoading);
 
       const start = () => {
         store.dispatch("startAdven7ure");
@@ -62,6 +65,7 @@
       return {
         inputValue,
         start,
+        isLoading,
         update,
         handleSubmitInput,
         messages,
@@ -70,6 +74,12 @@
   };
 </script>
 <style>
+  .page-header {
+    text-align: center;
+    position: relative; /* Add position relative to create a reference point */
+    background-color: #f0f0f0; /* Optional: Add background color for better visibility */
+  }
+
   .container {
     display: flex;
     flex-direction: column;
@@ -77,7 +87,7 @@
     gap: 60px;
   }
 
-  .header-container {
+  .settings-container {
     border: 1px solid #ccc;
     border-radius: 5px;
     height: 200px;
