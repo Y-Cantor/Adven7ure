@@ -8,7 +8,7 @@
       @input="onInput"
       @keyup.enter="onEnterPressed"
     />
-    <button>{{ buttonText }}</button>
+    <button @click="onButtonClick">{{ buttonText }}</button>
   </div>
 </template>
 
@@ -46,6 +46,7 @@
       },
       submitInput() {
         this.$emit("submitInput", this.inputValue);
+        this.inputValue = "";
       },
     },
   };
