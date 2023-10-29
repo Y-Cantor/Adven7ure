@@ -1,19 +1,27 @@
 <template>
   <div class="message">
-    {{ message.content }}
+    {{ messages[index].content }}
   </div>
 </template>
 
 <script>
+  import { useStore } from "vuex";
+  import { computed } from "vue";
+
   export default {
     props: {
+      index: Number,
       message: Object,
+    },
+    setup() {
+      const store = useStore();
+      const messages = computed(() => store.getters.getMessages);
+      return { messages };
     },
   };
 </script>
 
 <style scoped>
-  /* Add styling for your message component here */
   .message {
     background-color: #f0f0f0;
     border: 1px solid #ddd;

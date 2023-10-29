@@ -11,7 +11,7 @@ export const createSystemMessage = (numberOfSentences, theme, name) => {
               1. You MUST mix between the different types of questions.
               2. you MUST NOT use the same type of question twice in a row.
               3. You MUST use a very simple English
-              4. Each message should be up to ${numberOfSentences} sentences
+              4. Each message should be around ${numberOfSentences} sentences
               ${theme}
               ${name}`,
   };

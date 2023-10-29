@@ -10,17 +10,18 @@
         @update="update"
       />
     </div>
-    <div v-if="messages.length" class="messages-container">
+    <div class="messages-container" id="messagesContainer">
       <MessageBox
         v-for="(message, index) in messages"
         :key="index"
         :message="message"
+        :index="index"
       >
       </MessageBox>
+      <div v-if="isLoading" class="loader">Loading...</div>
     </div>
-    <div v-if="isLoading" class="loader">Loading...</div>
     <div class="input-container">
-      <h3>What Do You Do?</h3>
+      <h3 class="what-do-you-do-header">What Do You Do?</h3>
       <InputWithButton
         placeholder="Enter something"
         :buttonText="'Submit'"
@@ -32,7 +33,7 @@
 </template>
 
 <script>
-  import { ref } from "vue";
+  import { ref, watch } from "vue";
   import InputWithButton from "./InputWithButton.vue";
   import MessageBox from "./MessageBox.vue";
   import AdventureSettings from "./AdventureSettings.vue";
@@ -50,17 +51,48 @@
       const inputValue = ref("");
       const store = useStore();
       const messages = computed(() => store.getters.getMessages);
+      const messagesLength = computed(() => messages.value.length);
+      const lastMessageLength = computed(() =>
+        messages.value.length
+          ? store.state.messages[messagesLength.value - 1].content.length
+          : 0
+      );
+
       const isLoading = computed(() => store.getters.isLoading);
 
-      const start = () => {
-        store.dispatch("startAdven7ure");
+      const start = (settings) => {
+        console.log(settings);
+
+        store.dispatch("startAdven7ure", settings);
       };
 
-      const update = () => {};
-      const handleSubmitInput = (inputValue) => {
-        console.log("handleSubmitInput with input:", inputValue);
-        store.dispatch("submitMessage", inputValue);
+      const update = (settings) => {
+        store.dispatch("updateAdven7ureSettings", settings);
       };
+
+      const handleSubmitInput = (inputValue) => {
+        store.dispatch("submitMessage", inputValue);
+        setTimeout(scrollToBottom(), 500);
+      };
+
+      const scrollToBottom = () => {
+        const scrollContainer = document.getElementById("messagesContainer");
+        if (scrollContainer)
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      };
+
+      watch(lastMessageLength, (newValue, oldValue) => {
+        if (newValue > oldValue) scrollToBottom();
+      });
+
+      // eslint-disable-next-line
+      watch(isLoading, (newValue, oldValue) => {
+        console.log("isloading");
+        setTimeout(scrollToBottom(), 100);
+        setTimeout(scrollToBottom(), 200);
+        setTimeout(scrollToBottom(), 500);
+        setTimeout(scrollToBottom(), 1000);
+      });
 
       return {
         inputValue,
@@ -69,6 +101,7 @@
         update,
         handleSubmitInput,
         messages,
+        lastMessageLength,
       };
     },
   };
@@ -84,13 +117,15 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 60px;
+    gap: 20px;
   }
 
   .settings-container {
     border: 1px solid #ccc;
     border-radius: 5px;
-    height: 200px;
+    height: auto;
+    padding: 10px;
+    margin-block: 0;
   }
 
   .messages-container {
@@ -98,7 +133,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-height: 400px;
+    max-height: 480px;
     overflow-y: auto;
   }
 
@@ -109,6 +144,10 @@
     position: absolute; /* Set the position of the input container to absolute */
     bottom: 0; /* Place it at the bottom of the parent container */
     width: 100%; /* Take up the full width of the parent container */
+  }
+
+  .what-do-you-do-header {
+    margin-block: 0;
   }
 
   /* Add more styling as needed */

@@ -1,12 +1,10 @@
 <template>
   <div>
-    <div v-if="variant === 1" class="update-adventure">
-      <h3>Update Your Settings</h3>
-      <!-- <button @click="update" class="start-button">UPDATE</button> -->
+    <div v-if="variant > 0">
+      <h3 class="update-adventure-header">Update Your Settings</h3>
     </div>
     <div v-else class="start-adventure">
-      <h3>Choose your settings</h3>
-      <!-- <button @click="start" class="start-button">START</button> -->
+      <h3 class="start-adventure-header">Choose your settings</h3>
     </div>
   </div>
   <div>
@@ -19,8 +17,8 @@
             id="name"
             v-model="formData.name"
             :required="false"
-            :readonly="variant === 1"
-            :class="{ 'read-only-input': variant === 1 }"
+            :readonly="variant > 0"
+            :class="{ 'read-only-input': variant > 0 }"
           />
         </div>
         <div class="form-field">
@@ -30,8 +28,8 @@
             id="theme"
             v-model="formData.theme"
             :required="false"
-            :readonly="variant === 1"
-            :class="{ 'read-only-input': variant === 1 }"
+            :readonly="variant > 0"
+            :class="{ 'read-only-input': variant > 0 }"
           />
         </div>
         <div class="form-field">
@@ -45,7 +43,7 @@
         </div>
       </div>
       <div class="submit-button">
-        <button v-if="variant === 1" type="submit">Update</button>
+        <button v-if="variant > 0" type="submit">Update</button>
         <button v-else type="submit">Start</button>
       </div>
     </form>
@@ -53,6 +51,9 @@
 </template>
 
 <script>
+  import { ref } from "vue";
+  import { defaultNumberOfSentences } from "../consts/consts";
+
   export default {
     props: {
       variant: {
@@ -60,25 +61,33 @@
         default: 0,
       },
     },
-    data() {
-      return {
-        formData: {
-          name: "Lupin's Adventure",
-          theme: "Harry Potter",
-          numOfSentences: 3,
-        },
-        submitted: false,
-      };
-    },
-    methods: {
-      handleSubmit(event) {
-        event.preventDefault(); // Prevent the form from actually submitting
+    emits: ["start", "update"],
+    setup(props, { emit }) {
+      const formData = ref({
+        name: "Lupin's Adventure",
+        theme: "Harry Potter",
+        numOfSentences: defaultNumberOfSentences,
+      });
 
-        // You can handle the form data here, for example, send it to an API
-        // For this example, we'll just set the "submitted" flag to true.
-        this.submitted = true;
-        this.$emit("start");
-      },
+      const handleSubmit = (event) => {
+        event.preventDefault();
+        const numOfSentences = parseInt(formData.value.numOfSentences, 10);
+
+        if (props.variant === 0) {
+          emit("start", {
+            numOfSentences,
+          });
+        } else {
+          emit("update", {
+            numOfSentences,
+          });
+        }
+      };
+
+      return {
+        formData,
+        handleSubmit,
+      };
     },
   };
 </script>
@@ -87,7 +96,7 @@
   .form {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 0.5em;
   }
 
   .form-fields {
@@ -117,5 +126,10 @@
     background-color: #f0f0f0;
     color: #555;
     pointer-events: none; /* Prevent interaction with the input */
+  }
+
+  .start-adventure-header,
+  .update-adventure-header {
+    margin-block: 0;
   }
 </style>
