@@ -19,6 +19,7 @@ const store = createStore({
     systemMessage: {},
     messages: [],
     isLoading: false,
+    isStreaming: false,
   },
   mutations: {
     addMessages(state, messages) {
@@ -33,13 +34,18 @@ const store = createStore({
     setIsLoading(state, isLoading) {
       state.isLoading = isLoading;
     },
+    setIsStreaming(state, isStreaming) {
+      state.isStreaming = isStreaming;
+    },
     setNumberOfSentences(state, numOfSentences) {
+      console.log("setNumberOfSentences", numOfSentences);
       state.numberOfSentences = numOfSentences;
     },
   },
   actions: {
     async createAnswer({ commit }, { messages, streamText }) {
       if (streamText) {
+        commit("setIsStreaming", true);
         const stream = await createStreamChatCompletion(messages);
         const answer = { role: "assistant", content: "" };
         commit("addMessages", [answer]);
@@ -52,6 +58,7 @@ const store = createStore({
           }
           commit("updateLastMessage", answer);
         }
+        commit("setIsStreaming", false);
       } else {
         createChatCompletion(messages)
           .then((res) => {
@@ -104,6 +111,7 @@ const store = createStore({
   getters: {
     getMessages: (state) => state.messages,
     isLoading: (state) => state.isLoading,
+    isStreaming: (state) => state.isStreaming,
   },
 });
 

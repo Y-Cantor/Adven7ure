@@ -2,52 +2,64 @@
   <div class="input-button-container">
     <textarea
       v-model="inputValue"
-      :type="type"
+      type="text"
       :size="size"
-      :placeholder="placeholder"
+      :placeholder="readOnly ? '' : 'Enter Something'"
       @input="onInput"
       @keyup.enter="onEnterPressed"
+      :disabled="readOnly"
     />
-    <button @click="onButtonClick">{{ buttonText }}</button>
+    <button @click="onButtonClick" :disabled="readOnly">Submit</button>
   </div>
 </template>
 
 <script>
+  import { ref } from "vue";
+
   export default {
     props: {
-      type: {
-        type: String,
-        default: "text",
+      variant: {
+        type: Number,
+        default: 0,
       },
-      placeholder: String,
       size: {
         type: Number,
         default: 100,
       },
-      buttonText: {
-        type: String,
-        default: "Submit",
+      readOnly: {
+        type: Boolean,
+        default: false,
       },
     },
-    data() {
+    setup(props, { emit }) {
+      const inputValue = ref("");
+
+      function onInput(event) {
+        inputValue.value = event.target.value;
+      }
+
+      function onEnterPressed() {
+        submitInput();
+      }
+
+      function onButtonClick() {
+        submitInput();
+      }
+
+      function submitInput() {
+        const cleanedInput = inputValue.value.replace(/\s+/g, "");
+        if (cleanedInput.length > 0) {
+          emit("submitInput", cleanedInput);
+          inputValue.value = "";
+        }
+      }
+
       return {
-        inputValue: "",
+        inputValue,
+        onInput,
+        onEnterPressed,
+        onButtonClick,
       };
-    },
-    methods: {
-      onInput(event) {
-        this.inputValue = event.target.value;
-      },
-      onEnterPressed() {
-        this.submitInput();
-      },
-      onButtonClick() {
-        this.submitInput();
-      },
-      submitInput() {
-        this.$emit("submitInput", this.inputValue);
-        this.inputValue = "";
-      },
     },
   };
 </script>

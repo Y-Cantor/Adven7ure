@@ -13,7 +13,6 @@ export const createChatCompletion = async (messages) => {
     };
     openai = new OpenAI(configuration);
   } else {
-    console.log(process.env);
     throw "No API key";
   }
 
@@ -24,6 +23,7 @@ export const createChatCompletion = async (messages) => {
 };
 
 export const createStreamChatCompletion = async (messages) => {
+  console.log(messages[0]);
   let openai;
 
   if (process.env.VUE_APP_OPEN_AI_API_KEY) {
@@ -33,7 +33,6 @@ export const createStreamChatCompletion = async (messages) => {
     };
     openai = new OpenAI(configuration);
   } else {
-    console.log(process.env);
     throw "No API key";
   }
 

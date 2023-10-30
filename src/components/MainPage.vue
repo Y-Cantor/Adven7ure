@@ -23,8 +23,7 @@
     <div class="input-container">
       <h3 class="what-do-you-do-header">What Do You Do?</h3>
       <InputWithButton
-        placeholder="Enter something"
-        :buttonText="'Submit'"
+        :read-only="readOnly"
         @submitInput="handleSubmitInput"
         v-model="inputValue"
       />
@@ -59,10 +58,14 @@
       );
 
       const isLoading = computed(() => store.getters.isLoading);
+      const isStreaming = computed(() => store.getters.isStreaming);
+
+      const readOnly = computed(
+        () =>
+          messages.value.length === 0 || isLoading.value || isStreaming.value
+      );
 
       const start = (settings) => {
-        console.log(settings);
-
         store.dispatch("startAdven7ure", settings);
       };
 
@@ -87,7 +90,7 @@
 
       // eslint-disable-next-line
       watch(isLoading, (newValue, oldValue) => {
-        console.log("isloading");
+        console.log("isloading", newValue, oldValue);
         setTimeout(scrollToBottom(), 100);
         setTimeout(scrollToBottom(), 200);
         setTimeout(scrollToBottom(), 500);
@@ -98,6 +101,7 @@
         inputValue,
         start,
         isLoading,
+        readOnly,
         update,
         handleSubmitInput,
         messages,
