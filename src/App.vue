@@ -7,6 +7,7 @@
 <script>
   // import HelloWorld from "./components/HelloWorld.vue";
   import MainPage from "./components/MainPage.vue";
+  import "./assets/styles.css";
 
   export default {
     name: "App",

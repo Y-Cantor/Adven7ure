@@ -1,0 +1,9 @@
+:root {
+  --beige: rgb(242, 242, 231);
+  --yellow-beige: #f1f1c7b4;
+  --dark-beige: #d4d4bcb4;
+}
+
+body {
+  background: var(--dark-beige);
+}

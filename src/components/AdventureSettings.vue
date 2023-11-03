@@ -1,58 +1,65 @@
 <template>
-  <div>
-    <div v-if="variant > 0">
-      <h3 class="update-adventure-header">Update Your Settings</h3>
-    </div>
-    <div v-else class="start-adventure">
-      <h3 class="start-adventure-header">Choose your settings</h3>
-    </div>
-  </div>
-  <div>
-    <form @submit="handleSubmit" class="form">
-      <div class="form-fields">
-        <div class="form-field">
-          <label for="name">Adven7ure Name</label>
-          <input
-            type="text"
-            id="name"
-            v-model="formData.name"
-            :required="false"
-            :readonly="variant > 0"
-            :class="{ 'read-only-input': variant > 0 }"
-          />
-        </div>
-        <div class="form-field">
-          <label for="theme">Theme</label>
-          <input
-            type="text"
-            id="theme"
-            v-model="formData.theme"
-            :required="false"
-            :readonly="variant > 0"
-            :class="{ 'read-only-input': variant > 0 }"
-          />
-        </div>
-        <div class="form-field">
-          <label for="numOfSentences">Number of sentences</label>
-          <input
-            type="text"
-            id="numOfSentences"
-            v-model="formData.numOfSentences"
-            :required="false"
-          />
-        </div>
+  <h3>{{ variant > 0 ? "Update Your Settings" : "Choose your settings" }}</h3>
+  <div class="settings-form">
+    <el-form
+      :inline="false"
+      :model="formInline"
+      class="form-inline"
+      :label-position="'right'"
+      label-width="150px"
+    >
+      <div class="form-row">
+        <el-form-item label="Adven7ure Name">
+          <el-input v-model="formInline.name" :disabled="variant > 0" />
+        </el-form-item>
+        <el-form-item label="Theme">
+          <el-input v-model="formInline.theme" :disabled="variant > 0" />
+        </el-form-item>
       </div>
-      <div class="submit-button">
-        <button v-if="variant > 0" type="submit">Update</button>
-        <button v-else type="submit">Start</button>
+      <div class="form-row">
+        <el-form-item label="# of Sentences">
+          <el-select v-model="formInline.numberOfSentences">
+            <el-option
+              v-for="(num, index) in [3, 4, 5, 6, 7]"
+              :key="index"
+              :label="num"
+              :value="num"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="English Level">
+          <el-select v-model="formInline.englishLevel">
+            <el-option
+              v-for="(level, index) in [
+                'Beginner',
+                'Intermediate',
+                'Proficient',
+              ]"
+              :key="index"
+              :label="level"
+              :value="level"
+          /></el-select>
+        </el-form-item>
       </div>
-    </form>
+      <div class="form-row">
+        <el-form-item class="start-button">
+          <el-button type="primary" @click="handleSubmit">{{
+            variant > 0 ? "Update" : "Start"
+          }}</el-button>
+        </el-form-item>
+      </div>
+    </el-form>
   </div>
 </template>
 
 <script>
-  import { ref } from "vue";
-  import { defaultNumberOfSentences } from "../consts/consts";
+  import {
+    defaultNumberOfSentences,
+    defaultTheme,
+    defaultName,
+    defaultEnglishLevel,
+  } from "../consts/consts";
+  import { reactive } from "vue";
 
   export default {
     props: {
@@ -63,73 +70,60 @@
     },
     emits: ["start", "update"],
     setup(props, { emit }) {
-      const formData = ref({
-        name: "Lupin's Adventure",
-        theme: "Harry Potter",
-        numOfSentences: defaultNumberOfSentences,
-      });
-
       const handleSubmit = (event) => {
         event.preventDefault();
-        const numOfSentences = parseInt(formData.value.numOfSentences, 10);
+        const numberOfSentences = parseInt(formInline.numberOfSentences, 10);
+
+        const storySettings = {
+          numberOfSentences,
+          theme: formInline.theme,
+          name: formInline.name,
+          englishLevel: formInline.englishLevel,
+        };
 
         if (props.variant === 0) {
-          emit("start", {
-            numOfSentences,
-          });
+          emit("start", storySettings);
         } else {
-          emit("update", {
-            numOfSentences,
-          });
+          emit("update", storySettings);
         }
       };
 
+      const formInline = reactive({
+        name: defaultName,
+        theme: defaultTheme,
+        numberOfSentences: defaultNumberOfSentences,
+        englishLevel: defaultEnglishLevel,
+      });
+
       return {
-        formData,
         handleSubmit,
+        formInline,
       };
     },
   };
 </script>
-
-<style scoped>
-  .form {
+<style>
+  .settings-form {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    align-items: center;
   }
 
-  .form-fields {
+  .form-inline {
+    width: 800px;
+  }
+
+  .form-inline .el-input {
+    --el-input-width: 150px;
+  }
+
+  .form-row {
     display: flex;
     justify-content: center;
-    /* flex-wrap: wrap; */
+    margin-bottom: 10px; /* Add spacing between rows as needed */
   }
 
-  .form-field {
-    display: flex;
-    flex-direction: column;
-    /* flex: 0 0 50%; */
-    padding: 8px;
-  }
-
-  .form-field label {
-    /* color: purple; */
-    font: 0.8em sans-serif;
-  }
-
-  .form-field input {
-    /* color: purple; */
-    text-align: center;
-  }
-
-  .read-only-input {
-    background-color: #f0f0f0;
-    color: #555;
-    pointer-events: none; /* Prevent interaction with the input */
-  }
-
-  .start-adventure-header,
-  .update-adventure-header {
-    margin-block: 0;
+  .start-button .el-button--primary {
+    margin-left: -105px;
   }
 </style>

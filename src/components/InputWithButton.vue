@@ -49,7 +49,7 @@
       function submitInput() {
         const cleanedInput = inputValue.value.replace(/\s+/g, "");
         if (cleanedInput.length > 0) {
-          emit("submitInput", cleanedInput);
+          emit("submitInput", inputValue.value);
           inputValue.value = "";
         }
       }
@@ -67,6 +67,7 @@
 <style>
   textarea {
     width: 80%;
+    max-width: 600px;
     min-height: 4em;
     height: auto; /* Allow the height to adjust based on content */
     resize: none;

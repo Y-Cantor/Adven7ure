@@ -1,36 +1,70 @@
 <template>
-  <div class="page-header">
-    <h2>Create Your Own Adven7ure</h2>
-  </div>
-  <div class="container">
-    <div class="settings-container">
-      <AdventureSettings
-        :variant="messages.length"
-        @start="start"
-        @update="update"
-      />
-    </div>
-    <div class="messages-container" id="messagesContainer">
-      <MessageBox
-        v-for="(message, index) in messages"
-        :key="index"
-        :message="message"
-        :index="index"
-      >
-      </MessageBox>
-      <div v-if="isLoading" class="loader">Loading...</div>
-    </div>
-    <div class="input-container">
+  <el-container v-if="true">
+    <el-header height="40px"><h2>Create Your Own Adven7ure</h2></el-header>
+    <el-main>
+      <el-container class="settings-component-container">
+        <el-main class="settings-component">
+          <AdventureSettings
+            :variant="messages.length"
+            @start="start"
+            @update="update"
+          />
+        </el-main>
+      </el-container>
+      <el-container class="messages-component-container">
+        <el-main class="messages-component" id="messagesContainer">
+          <MessageBox
+            v-for="(message, index) in messages"
+            :key="index"
+            :message="message"
+            :index="index"
+          >
+          </MessageBox>
+        </el-main>
+      </el-container>
+    </el-main>
+    <el-footer>
       <h3 class="what-do-you-do-header">What Do You Do?</h3>
       <InputWithButton
         :read-only="readOnly"
         @submitInput="handleSubmitInput"
         v-model="inputValue"
+        v-loading="isLoading"
+        element-loading-background="rgba(0, 0, 0, 0)"
       />
-    </div>
-  </div>
+    </el-footer>
+  </el-container>
+  <el-container v-else>
+    <el-header>Create Your Own Adven7ure</el-header>
+    <el-container>
+      <el-aside width="400px">
+        <AdventureSettings
+          :variant="messages.length"
+          @start="start"
+          @update="update"
+      /></el-aside>
+      <el-container>
+        <el-main>
+          <MessageBox
+            v-for="(message, index) in messages"
+            :key="index"
+            :message="message"
+            :index="index"
+          >
+          </MessageBox>
+        </el-main>
+        <el-footer>
+          <h3 class="what-do-you-do-header">What Do You Do?</h3>
+          <InputWithButton
+            :read-only="readOnly"
+            @submitInput="handleSubmitInput"
+            v-model="inputValue"
+          />
+        </el-footer>
+      </el-container>
+    </el-container>
+  </el-container>
 </template>
-
 <script>
   import { ref, watch } from "vue";
   import InputWithButton from "./InputWithButton.vue";
@@ -111,48 +145,17 @@
   };
 </script>
 <style>
-  .page-header {
-    text-align: center;
-    position: relative; /* Add position relative to create a reference point */
-    background-color: #f0f0f0; /* Optional: Add background color for better visibility */
-  }
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 20px;
-  }
-
-  .settings-container {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    height: auto;
-    padding: 10px;
-    margin-block: 0;
-  }
-
-  .messages-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    max-height: 480px;
+  .messages-component {
+    max-height: 400px;
     overflow-y: auto;
+    /* background: lightblue; */
   }
 
-  .input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    position: absolute; /* Set the position of the input container to absolute */
-    bottom: 0; /* Place it at the bottom of the parent container */
-    width: 100%; /* Take up the full width of the parent container */
+  .messages-component-container .el-main {
+    position: relative;
+    padding: 0 15% 0 15%;
   }
-
-  .what-do-you-do-header {
-    margin-block: 0;
+  .settings-component-container .el-main {
+    padding: 0;
   }
-
-  /* Add more styling as needed */
 </style>

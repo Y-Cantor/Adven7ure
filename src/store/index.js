@@ -13,11 +13,13 @@ import { createSystemMessage } from "@/helpers/systemMessage.js";
 
 const store = createStore({
   state: {
-    numberOfSentences: defaultNumberOfSentences,
-    theme: defaultTheme,
-    name: defaultName,
+    storySettings: {
+      numberOfSentences: defaultNumberOfSentences,
+      theme: defaultTheme,
+      name: defaultName,
+    },
     systemMessage: {},
-    messages: [],
+    messages: [], //[{ role: "assistant", content: "lorem ipsum " }],
     isLoading: false,
     isStreaming: false,
   },
@@ -37,9 +39,8 @@ const store = createStore({
     setIsStreaming(state, isStreaming) {
       state.isStreaming = isStreaming;
     },
-    setNumberOfSentences(state, numOfSentences) {
-      console.log("setNumberOfSentences", numOfSentences);
-      state.numberOfSentences = numOfSentences;
+    setStorySettings(state, { numberOfSentences, theme, name }) {
+      state.storySettings = { numberOfSentences, theme, name };
     },
   },
   actions: {
@@ -74,15 +75,12 @@ const store = createStore({
     },
     async startAdven7ure(
       { state, commit },
-      { numOfSentences, streamText = true }
+      { numberOfSentences, theme, name },
+      streamText = true
     ) {
       commit("setIsLoading", true);
-      commit("setNumberOfSentences", numOfSentences);
-      const systemMessage = createSystemMessage(
-        state.numberOfSentences,
-        state.theme,
-        state.name
-      );
+      commit("setStorySettings", { numberOfSentences, theme, name });
+      const systemMessage = createSystemMessage(state.storySettings);
       commit("setSystemMessage", systemMessage);
       this.dispatch("createAnswer", {
         messages: [state.systemMessage],
@@ -98,13 +96,12 @@ const store = createStore({
         streamText: streamText,
       });
     },
-    async updateAdven7ureSettings({ state, commit }, { numOfSentences }) {
-      commit("setNumberOfSentences", numOfSentences);
-      const systemMessage = createSystemMessage(
-        state.numberOfSentences,
-        state.theme,
-        state.name
-      );
+    async updateAdven7ureSettings(
+      { state, commit },
+      { numberOfSentences, theme, name }
+    ) {
+      commit("setStorySettings", { numberOfSentences, theme, name });
+      const systemMessage = createSystemMessage(state.storySettings);
       commit("setSystemMessage", systemMessage);
     },
   },
